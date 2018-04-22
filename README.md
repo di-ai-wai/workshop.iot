@@ -22,3 +22,5 @@ Der Source-Code der einzelnen Lessons ist über github.com verfügbar
 ### Schritt 2: Erstes Beispiel: Blinking LED
 
 ### Schritt 3: Zweites Beispiel: Helligkeit messen mit LDR
+
+### Schritt 4: Nächste Erweiterung: Temperatur und Feuchtigkeit mit DHT messen und ausgeben
