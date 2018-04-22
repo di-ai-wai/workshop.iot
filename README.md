@@ -18,3 +18,5 @@ Der Source-Code der einzelnen Lessons ist über github.com verfügbar
 ## Ablauf
 
 ### Schritt 1: Erzeugen des ESP32-Projektes im VCode
+
+### Schritt 2: Erstes Beispiel: Blinking LED
