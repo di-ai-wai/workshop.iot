@@ -3,12 +3,16 @@
  * 
  * (c) 2018 Stefan Peter, Andre Wölfing
  * 
- * V1.2 Blinking LED
+ * V1.1 Blinking LED & Helligkeit mit LDR
  **/
 
 #include <Arduino.h>
 
 #define LED_PIN         5       // LED Pin auf LOLIN32
+#define LDR_SENSOR      A0      // LDR auf analogem Eingang mit Spannungsteiler
+
+// globale Variablen
+int sensorValue;                // Speichern des Helligkeitswertes
 
 /**
  * setup - wird einmal beim Programmstart ausgeführt
@@ -23,10 +27,14 @@ void setup() {
  * das "Hauptmodul" wird in einem Loop ausgeführt
  **/
 void loop() {
-    Serial.println("LED an");
     digitalWrite(LED_PIN, HIGH);        // LED_PIN auf HIGH, d.h. LED leuchtet
+    
+    sensorValue = analogRead(LDR_SENSOR); // read analog input pin 0
+    Serial.print(" Helligkeit: ");
+    Serial.println(sensorValue, DEC);
+
     delay(500);     
-    Serial.println("LED aus");
+ 
     digitalWrite(LED_PIN, LOW);         // LED_PIN auf LOW, d.h. LED ist aus
     delay(500);
 }
