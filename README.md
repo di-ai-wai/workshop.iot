@@ -26,3 +26,5 @@ Der Source-Code der einzelnen Lessons ist über github.com verfügbar
 ### Schritt 4: Nächste Erweiterung: Temperatur und Feuchtigkeit mit DHT messen und ausgeben
 
 ### Schritt 5: Erweiterung: Temperatur und Luftdruck mit BME280 zusätzlich messen und ausgeben
+
+### Schritt 6: der Weg ins WiFi und damit in die große weite Welt

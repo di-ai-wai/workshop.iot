@@ -7,12 +7,14 @@
  * V1.1 Helligkeit mit LDR
  * V1.2 Zusätzlich Temperatur und Feuchtigkeit messen
  * V1.3 Temperatur und Luftdruck mit BME280 auslesen
+ * V1.4 WiFi-enabling
  **/
 
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <BME280.h>
+#include <WiFi.h>
 
 #define LED_PIN         5       // LED Pin auf LOLIN32
 #define LDR_SENSOR      A0      // LDR auf analogem Eingang mit Spannungsteiler
@@ -27,11 +29,34 @@ float dht_temp;                 // Temperaturvariable
 float bme_temp;                 // Vergleichstemperatur
 float bme_press;                // Luftdruck
 
+// WiFi Infos
+const char* ssid     = "iot";
+const char* password = "10T-W0rksh0P";
+
 /* Setup des DHT-Sensors, abhängig vom Typ */
 DHT dht(DHT_PIN, DHT_WEISS);
 
 /* der BME280 wird über I2C angeschlossen SLC/SDA */
 BME280 bme;
+
+/**
+ * Verbinde mit WiFi mit den angegebenen Credentials
+ **/
+void connectToWiFi() {
+    Serial.println("\n");
+    Serial.print("Verbinde ");
+    Serial.println(ssid);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("");
+    Serial.println("WiFi verbunden");
+    Serial.println("IP Adresse: ");
+    Serial.println(WiFi.localIP());
+    Serial.println("\n");  
+}
 
 /**
  * setup - wird einmal beim Programmstart ausgeführt
@@ -43,12 +68,16 @@ void setup() {
     dht.begin();                    // Starten des Sensors
     Serial.println("DHT Sensor initialisiert...");
 
+    /* BME280 initialisieren */
     bme.settings(0, 3, 5, 4, 3, 3, 3);
     if (!bme.begin()) {
         Serial.println("Konnte keinen BMP280 sensor finden, bitte prüfe Verkabelung!");
         while (1);
     }
     Serial.println("BME280 Sensor initialisiert...");
+
+    /* WiFi */
+    connectToWiFi();
 }
 
 /**
