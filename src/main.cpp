@@ -8,6 +8,7 @@
  * V1.2 Zusätzlich Temperatur und Feuchtigkeit messen
  * V1.3 Temperatur und Luftdruck mit BME280 auslesen
  * V1.4 WiFi-enabling
+ * V1.5 Ab in die IOT-Welt: MQTT
  **/
 
 #include <Arduino.h>
@@ -15,6 +16,8 @@
 #include <DHT.h>
 #include <BME280.h>
 #include <WiFi.h>
+#include <Adafruit_MQTT.h>
+#include <Adafruit_MQTT_Client.h>
 
 #define LED_PIN         5       // LED Pin auf LOLIN32
 #define LDR_SENSOR      A0      // LDR auf analogem Eingang mit Spannungsteiler
@@ -33,11 +36,25 @@ float bme_press;                // Luftdruck
 const char* ssid     = "iot";
 const char* password = "10T-W0rksh0P";
 
+//MQTT broker settings
+#define HOST        "192.168.178.63"
+#define PORT        1883
+#define USERNAME    "iot"
+#define PASSWORD    "w0rksh0p"
+
 /* Setup des DHT-Sensors, abhängig vom Typ */
 DHT dht(DHT_PIN, DHT_WEISS);
 
 /* der BME280 wird über I2C angeschlossen SLC/SDA */
 BME280 bme;
+
+/* MQTT Publish/Subscribe */
+WiFiClient client;
+Adafruit_MQTT_Client mqtt(&client, HOST, PORT, USERNAME, PASSWORD);
+Adafruit_MQTT_Publish temperature = Adafruit_MQTT_Publish(&mqtt, "weatherStation/temperature");
+Adafruit_MQTT_Publish pressure = Adafruit_MQTT_Publish(&mqtt, "weatherStation/pressure");
+Adafruit_MQTT_Publish humidity = Adafruit_MQTT_Publish(&mqtt, "weatherStation/humidity");
+Adafruit_MQTT_Publish light = Adafruit_MQTT_Publish(&mqtt, "weatherStation/light");
 
 /**
  * Verbinde mit WiFi mit den angegebenen Credentials
@@ -55,7 +72,26 @@ void connectToWiFi() {
     Serial.println("WiFi verbunden");
     Serial.println("IP Adresse: ");
     Serial.println(WiFi.localIP());
-    Serial.println("\n");  
+    Serial.println();  
+}
+
+/**
+ * Verbinde mit MQTT Broker
+ **/
+void connectToMQTT() {
+  int8_t ret;
+  if (mqtt.connected()) {
+    return;
+  }
+
+  Serial.print("Verbinde mit MQTT Broker... ");
+  while ((ret = mqtt.connect()) != 0) {
+       //Serial.println(mqtt.connectErrorString(ret));
+       //Serial.println("Retrying MQTT connection in 1 second...");
+       mqtt.disconnect();
+       delay(1000);
+  }
+  Serial.println("MQTT ist verbunden!\n");
 }
 
 /**
@@ -78,6 +114,9 @@ void setup() {
 
     /* WiFi */
     connectToWiFi();
+    /* MQTT */
+    connectToMQTT();
+    delay(100);
 }
 
 /**
@@ -107,6 +146,11 @@ void loop() {
     Serial.print("ºC   ");
     Serial.print(bme_press);
     Serial.println("Pa");
+
+    /* Publish to MQTT */
+    temperature.publish(bme_temp);
+    pressure.publish(bme_press);
+    humidity.publish(dht_humidity);
 
     delay(500);     
  
